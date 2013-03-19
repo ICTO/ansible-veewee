@@ -1,0 +1,45 @@
+---
+- name: "Basebox builder"
+  hosts: 127.0.0.1
+  connection: local
+  sudo: yes
+  sudo_user: root
+
+  vars:
+    - gem_bindir: "/var/lib/gems/1.8/bin/"
+    
+  vars_prompt:
+    - name: "template"
+      prompt: "Choose your template"
+      private: no
+
+    - name: "box_name"
+      prompt: "Name your basebox"
+      private: no
+
+    - name: "working_dir"
+      prompt: "Choose your working directory"
+      private: no
+
+  tasks:
+    - name: "Install Vagrant from gems"
+      action: gem name=vagrant state=latest
+
+    - name: "Install Veewee from gems"
+      action: gem name=veewee state=latest
+
+    - name: "Install Veewee-templates-updater from gems"
+      action: gem name=veewee-templates-updater state=latest
+
+    - name: "Update Veewee templates"
+      action: shell PATH=$PATH:${gem_bindir} veewee-templates-update
+
+    - name: "Define a new basebox"
+      action: shell PATH=$PATH:${gem_bindir} vagrant basebox define '${box_name}' '${template}' chdir=${working_dir}
+
+    - name: "Build a new basebox"
+      action: shell PATH=$PATH:${gem_bindir} vagrant basebox build '${box_name}' chdir=${working_dir}
+
+    - name: "Export the new basebox"
+      action: shell PATH=$PATH:${gem_bindir} vagrant basebox export '${box_name}' chdir=${working_dir}
+      tags:
