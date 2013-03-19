@@ -78,7 +78,9 @@ PLAY RECAP *********************
 ## Docs and contact
 
 Veewee: https://github.com/jedi4ever/veewee/blob/master/doc/vagrant.md
+
 Veewee templates updater: https://github.com/mpapis/veewee-templates-updater
+
 Vagrant: http://docs.vagrantup.com/v2/
 
 
