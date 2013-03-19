@@ -7,7 +7,7 @@
 
   vars:
     - gem_bindir: "/var/lib/gems/1.8/bin/"
-    
+
   vars_prompt:
     - name: "template"
       prompt: "Choose your template"
@@ -42,4 +42,3 @@
 
     - name: "Export the new basebox"
       action: shell PATH=$PATH:${gem_bindir} vagrant basebox export '${box_name}' chdir=${working_dir}
-      tags:
