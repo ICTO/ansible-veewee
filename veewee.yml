@@ -1,12 +1,7 @@
 ---
 - name: "Basebox builder"
-  hosts: 127.0.0.1
-  connection: local
-  sudo: yes
-  sudo_user: root
-
-  vars:
-    - gem_bindir: "/var/lib/gems/1.8/bin/"
+  hosts: builder
+  sudo: no
 
   vars_prompt:
     - name: "template"
@@ -20,10 +15,11 @@
     - name: "working_dir"
       prompt: "Choose your working directory"
       private: no
+      default: "builder"
 
   tasks:
-    - name: "Install Vagrant from gems"
-      action: gem name=vagrant state=latest
+    - name: "Check if Vagrant is present"
+      action: shell which vagrant
 
     - name: "Install Veewee from gems"
       action: gem name=veewee state=latest
@@ -32,13 +28,16 @@
       action: gem name=veewee-templates-updater state=latest
 
     - name: "Update Veewee templates"
-      action: shell PATH=$PATH:${gem_bindir} veewee-templates-update
+      action: shell $(ruby -rubygems -e 'puts Gem.user_dir')/bin/veewee-templates-update
+
+    - name: "Verify working directory"
+      file: path={{working_dir}} state=directory mode=0755
 
     - name: "Define a new basebox"
-      action: shell PATH=$PATH:${gem_bindir} vagrant basebox define '${box_name}' '${template}' chdir=${working_dir}
+      action: shell $(ruby -rubygems -e 'puts Gem.user_dir')/bin/veewee vbox define '{{box_name}}' '{{template}}' -f chdir={{working_dir}}
 
     - name: "Build a new basebox"
-      action: shell PATH=$PATH:${gem_bindir} vagrant basebox build '${box_name}' chdir=${working_dir}
+      action: shell $(ruby -rubygems -e 'puts Gem.user_dir')/bin/veewee vbox build '{{box_name}}' -f -a -n chdir={{working_dir}}
 
     - name: "Export the new basebox"
-      action: shell PATH=$PATH:${gem_bindir} vagrant basebox export '${box_name}' chdir=${working_dir}
+      action: shell $(ruby -rubygems -e 'puts Gem.user_dir')/bin/veewee vbox export '{{box_name}}' chdir={{working_dir}}
